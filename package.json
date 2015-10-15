@@ -1,0 +1,29 @@
+{
+  "name": "cron-master",
+  "version": "0.1.0",
+  "description": "Simple Cron management for Node.js applications",
+  "main": "index.js",
+  "dependencies": {
+    "async": "^1.4.2",
+    "cron": "^1.0.9",
+    "xtend": "^4.0.0"
+  },
+  "devDependencies": {
+    "chai": "^3.3.0",
+    "mocha": "^2.3.3",
+    "sinon": "^1.17.1"
+  },
+  "scripts": {
+    "test": "env NODE_PATH=. NODE_ENV=test mocha ./test -s 8000 -t 10000 -R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/evanshortiss/node-cron-master.git"
+  },
+  "author": "Evan Shortiss",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/evanshortiss/node-cron-master/issues"
+  },
+  "homepage": "https://github.com/evanshortiss/node-cron-master"
+}
