@@ -4,12 +4,13 @@ cron-master
 cron-master provides a standardised way to manage your Node.js CronJobs created 
 using the cron module.
 
-Typically in projects I've seen instances of _CronJob_ from the fantastic cron 
-module scattered throughout the codebase meaning they are hard to find and not 
+Typically in projects we'll see instances of _CronJob_ from the fantastic cron 
+module scattered throughout the codebase meaning they're hard to find and not 
 managed in a consistent manner. cron-master encourages the pattern of storing 
 all jobs in a single location, and ensures they all follow the same pattern. It 
 also adds events to your _CronJob_ instances so you can add generic hooks for 
-logging, detecting errors and overlapping calls. 
+logging, detecting errors, and preventing overlapping calls that can cause 
+unpredictable results.
 
 For example, if you have a job that runs every 5 minutes, did you remember to 
 ensure that next time it runs the previous run has completed!? cron-master 
@@ -18,11 +19,11 @@ again until the currently running call has completed.
 
 ## Features
 
-* Prevents a two versions of a CronJob running concurrently.
+* Prevents a the same CronJob running more than once concurrently.
 * Provides a structured way to create a manage jobs.
-* Enables jobs to emit and receive events, also provides some default events.
-* Automatically computes time taken by each CronMasterJob.
-* Provides error, and/or result from each job via event.
+* Enables jobs to emit and receive events, also provides useful default events.
+* Automatically computes time taken by each CronJob to complete.
+* Provides error, and/or result from each job via an event and/or callback.
 
 ## Install
 
@@ -80,7 +81,7 @@ A map of the event names, helps avoid spelling errors etc. Events:
 * TIME_WARNING - 'time-warning',
 * OVERLAPPING_CALL - 'overlapping-call'
 
-Usage examples below.
+Usage examples are included below.
 
 
 #### CronMasterJob
@@ -117,10 +118,15 @@ module.exports = new CronMasterJob({
   // passed if the job has not called the done callback
   timeThreshold: (2 * 60 * 1000),
 
+  // Optional. Can be used to add useful meta data for a job
+  meta: {
+    name: 'Test Job'
+  },
+
   // Just the usual params that you pass to the "cron" module!
   cronParams: {
     cronTime: '* * * * * *',
-    onTick: function (master, done) {
+    onTick: function (job, done) {
       console.log('Running job!');
       done(null, 'ok');
     }
@@ -143,7 +149,7 @@ module.exports = new CronMasterJob({
   // The usual params that you pass to the "cron" module go here
   cronParams: {
     cronTime: '* * * * * *',
-    onTick: function (master, done) {
+    onTick: function (job, done) {
       console.log('running job');
       done(null, 'result');
     }
@@ -166,14 +172,14 @@ var CronMasterJob = require('cron-master').CronMasterJob
 
 /**
  * Function to call for this cron job.
- * @param  {CronMaster}   master  Reference to the job itself, use for events.
+ * @param  {CronMaster}   job     Reference to the job itself, use for events.
  * @param  {Function}     done    Used to signal the job is finished.
  */
-function cronFn (master, done) {
+function cronFn (job, done) {
   var stopped = false;
 
-  // Let's use the master to allow this job to be stopped mid process!
-  master.once('stop-requested', stopListener);
+  // Let's use the job events to allow this job to be stopped mid process!
+  job.once('stop-requested', stopListener);
 
   function stopListener () {
     stopped = true;
@@ -190,7 +196,7 @@ function cronFn (master, done) {
 
   async.eachSeries(['a', 'b', 'c'], letterProcessor, function (err) {
     // Remove event bindings to prevent memory leaks!
-    master.removeListener('stop-requested', stopListener);
+    job.removeListener('stop-requested', stopListener);
 
     // Pass the result to the CronMasterJob callback
     done(err);
@@ -207,7 +213,7 @@ module.exports = new CronMasterJob({
   // Just the usual params that you pass to the "cron" module!
   cronParams: {
     cronTime: '00 */2 * * * *',
-    onTick: function (master, done) {
+    onTick: function (job, done) {
       console.log('ran job at %s', new Date().toJSON());
       done();
     }
@@ -240,10 +246,21 @@ cmaster.loadJobs(path.join(__dirname, '../', 'my-jobs'), function (err, jobs) {
       job.on('tick-complete', function (err, res, time) {
         console.log('Job tick complete in %d!', time);
         if (err) {
-          console.error('Error running job: %s', err);
+          console.error('Error running job %s: %s', job.meta.name, err);
         } else {
           console.log('Job complete. Result: %s', res);
         }
+      });
+
+      job.on(events.TIME_WARNING, function () {
+        console.log('Job has %s exceeded expected run time!', job.meta.name);
+      });
+
+      job.on('overlapping-call', function () {
+        console.log(
+          'Job %s attempting to run before previous tick is complete!',
+          job.meta.name
+        );
       });
     });
   }

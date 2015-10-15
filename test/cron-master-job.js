@@ -24,7 +24,8 @@ describe('Cron Master', function () {
     it('Should create an instance with defaults', function () {
       var inst = getDefaultCron();
 
-      expect(inst._inProgress).to.be.false;
+      expect(inst.meta).to.be.an('object');
+      expect(inst.inProgress).to.be.false;
       expect(inst._thresholdTimer).to.be.null;
       expect(inst._opts).to.be.an('object');
       expect(inst._opts.timeThreshold).to.be.a('number');
@@ -54,20 +55,20 @@ describe('Cron Master', function () {
       }).to.throw(Error);
     });
 
-    describe('#forceRun', function () {
-      it('Should run successfully with a callback', function (done) {
-        getDefaultCron().forceRun(function (err, result) {
-          expect(err).to.be.null;
-          expect(result).to.equal('ok');
-          done();
-        });
-      });
+  });
 
-      it('Should run successfully without a callback', function () {
-        getDefaultCron().forceRun();
+  describe('#forceRun', function () {
+    it('Should run successfully with a callback', function (done) {
+      getDefaultCron().forceRun(function (err, result) {
+        expect(err).to.be.null;
+        expect(result).to.equal('ok');
+        done();
       });
-    })
+    });
 
+    it('Should run successfully without a callback', function () {
+      getDefaultCron().forceRun();
+    });
   });
 
 
