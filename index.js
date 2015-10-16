@@ -11,14 +11,14 @@ var format = require('util').format
  * CronMasterJob Class accepts a params object to create CronJob wrappers
  * @type {CronMasterJob}
  */
-var CronMasterJob = exports.CronMasterJob = require('lib/cron-master-job');
+var CronMasterJob = exports.CronMasterJob = require('./lib/cron-master-job');
 
 
 /**
  * Events that can be bound to.
  * @type {Object}
  */
-exports.EVENTS = require('lib/events');
+exports.EVENTS = require('./lib/events');
 
 
 /**

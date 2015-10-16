@@ -14,7 +14,8 @@
     "sinon": "^1.17.1"
   },
   "scripts": {
-    "test": "env NODE_PATH=. NODE_ENV=test mocha ./test -s 8000 -t 10000 -R spec"
+    "test": "env NODE_PATH=. NODE_ENV=test mocha ./test -s 8000 -t 10000 -R spec",
+    "example": "node example/index.js"
   },
   "repository": {
     "type": "git",
