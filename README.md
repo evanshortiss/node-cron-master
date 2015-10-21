@@ -1,6 +1,10 @@
 cron-master
 ===========
 
+[![build-status](https://travis-ci.org/evanshortiss/node-cron-master.svg?branch=master)
+](https://travis-ci.org/evanshortiss/node-cron-master.svg?branch=master)[![version](https://badge.fury.io/js/node-cron-master.svg)
+](https://badge.fury.io/js/node-cron-master.svg)
+
 cron-master provides a standardised way to manage your Node.js CronJobs created 
 using the cron module.
 
