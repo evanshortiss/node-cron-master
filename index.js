@@ -22,6 +22,39 @@ exports.EVENTS = require('./lib/events');
 
 
 /**
+ * Check are the crons not running by verifying inProgress is false for all
+ * @return {Boolean}
+ */
+exports.hasRunningJobs = function () {
+  return (exports.getRunningJobs().length !== 0);
+};
+
+
+/**
+ * Get the currently loaded jobs
+ * @return {Array}
+ */
+exports.getJobs = function () {
+  return jobs || [];
+};
+
+
+/**
+ * Returns any running cron jobs i.e job.inProgress is true (Boolean)
+ * @return {Array}
+ */
+exports.getRunningJobs = function () {
+  if (jobs) {
+    return jobs.filter(function (j) {
+      return j.inProgress;
+    });
+  } else {
+    return [];
+  }
+};
+
+
+/**
  * Loads the cron jobs at the specified path.
  * @param  {String}   p
  * @param  {Function} callback
@@ -30,6 +63,9 @@ exports.loadJobs = function (p, callback) {
 
   function requireFile (file, done) {
     try {
+      // Ensure we get a unique instance of the job any time it's loaded
+      delete require.cache[require.resolve(path.join(p, file))];
+
       var job = require(path.join(p, file));
 
       if (job instanceof CronMasterJob) {

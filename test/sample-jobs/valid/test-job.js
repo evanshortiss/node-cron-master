@@ -4,9 +4,12 @@ var CronMasterJob = require('lib/cron-master-job');
 
 module.exports = new CronMasterJob({
   cronParams: {
+    start: false,
     cronTime: '* * * * * *',
     onTick: function (master, done) {
-      done(null, 'ok');
+      setTimeout(function () {
+        done(null, 'ok');
+      }, 1500);
     }
   }
 });

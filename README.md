@@ -46,6 +46,11 @@ Loads all jobs contained in the specified folder, and place them under the
 managment of cron-master. Each file in the folder must have module.exports set 
 to an instance of CronMasterJob.
 
+As of version 0.2.0 the jobs are not cached. This means if you call load jobs 
+a second time with the same jobs a new instance of the file containing the job
+will be loaded. This means the _require.cache_ for the specifc cron files your 
+loading is deleted.
+
 The callback should be of the format _function(err, jobs)_. _jobs_ will be an 
 Array of the managed jobs that were loaded.
 
@@ -62,6 +67,19 @@ cmaster.loadJobs(path.join(__dirname, '../', 'my-jobs'), function (err, jobs) {
 });
 ```
 
+
+#### hasRunningJobs()
+Returns a boolean indicating if any jobs are currently running.
+
+
+#### getJobs()
+Get an Array containing all currently loaded jobs.
+
+
+#### getRunningJobs()
+Get an Array containing all currently running jobs.
+
+
 #### startJobs(callback)
 Starts all jobs that are being managed so that they will be run at the time(s) 
 specified by their cron tab. Internally this will call the cron module _start_ 
@@ -72,7 +90,8 @@ function for each job.
 Stops all jobs being managed so they will no longer execute at the time 
 specified by their cron tab. If any jobs are currently in the middle of a tick 
 callback won't fire until they're all complete. Internally this will call the 
-cron module _stop_ function for each job.
+cron module _stop_ function for each job. You can short circuit your job 
+function to stop early by by using the STOP_REQUESTED event, examples below.
 
 
 #### EVENTS
@@ -164,70 +183,6 @@ module.exports = new CronMasterJob({
 ```
 
 
-#### Advanved Job
-The job below runs every 2 minutes. Interestingly however, it binds a one time 
-event listener to see if the job was requested to stop. If so it will prevent 
-further execution and simply skip the business logic.
-
-```javascript
-
-var CronMasterJob = require('cron-master').CronMasterJob  
-  , async = require('async')
-  , db = require('lib/db-wrapper');
-
-/**
- * Function to call for this cron job.
- * @param  {CronMaster}   job     Reference to the job itself, use for events.
- * @param  {Function}     done    Used to signal the job is finished.
- */
-function cronFn (job, done) {
-  var stopped = false;
-
-  // Let's use the job events to allow this job to be stopped mid process!
-  job.once('stop-requested', stopListener);
-
-  function stopListener () {
-    stopped = true;
-  }
-
-  function letterProcessor (letter, next) {
-    if (!stopped) {
-      // Do nothing, just skip since a stop was requested
-      next();
-    } else {
-      db.insert(letter, next)l
-    }
-  }
-
-  async.eachSeries(['a', 'b', 'c'], letterProcessor, function (err) {
-    // Remove event bindings to prevent memory leaks!
-    job.removeListener('stop-requested', stopListener);
-
-    // Pass the result to the CronMasterJob callback
-    done(err);
-  });
-}
-
-module.exports = new CronMasterJob({
-  
-  // Optional. Used to determine when to trigger the 'time-warning'. Fires after
-  // the provided number of milliseconds (e.g 2 minutes in the case below) has 
-  // passed if the job has not called the done callback
-  timeThreshold: (2 * 60 * 1000),
-
-  // Just the usual params that you pass to the "cron" module!
-  cronParams: {
-    cronTime: '00 */2 * * * *',
-    onTick: function (job, done) {
-      console.log('ran job at %s', new Date().toJSON());
-      done();
-    }
-  }
-
-});
-```
-
-
 #### Adding Events to Jobs
 
 ```javascript
@@ -271,3 +226,78 @@ cmaster.loadJobs(path.join(__dirname, '../', 'my-jobs'), function (err, jobs) {
   }
 });
 ```
+
+
+#### Advanved Job with Short Circuit 
+The job below runs every 2 minutes. Interestingly however, it binds a one time 
+event listener to see if the job was requested to stop. If so it will prevent 
+further execution and simply skip the business logic.
+
+```javascript
+
+var CronMasterJob = require('cron-master').CronMasterJob  
+  , async = require('async')
+  , db = require('lib/db-wrapper');
+
+/**
+ * Function to call for this cron job.
+ * @param  {CronMaster}   job     Reference to the job itself, use for events.
+ * @param  {Function}     done    Used to signal the job is finished.
+ */
+function cronFn (job, done) {
+  var stopped = false;
+
+  // Let's use the job events to allow this job to be stopped mid process!
+  job.once('stop-requested', stopListener);
+
+  function stopListener () {
+    stopped = true;
+  }
+
+  function letterProcessor (letter, next) {
+    if (!stopped) {
+      // Do nothing, just skip since a stop was requested
+      next();
+    } else {
+      db.insert(letter, next);
+    }
+  }
+
+  async.eachSeries(['a', 'b', 'c'], letterProcessor, function (err) {
+    // Remove event bindings to prevent memory leaks!
+    job.removeListener('stop-requested', stopListener);
+
+    // Pass the result to the CronMasterJob callback
+    done(err);
+  });
+}
+
+module.exports = new CronMasterJob({
+  
+  // Optional. Used to determine when to trigger the 'time-warning'. Fires after
+  // the provided number of milliseconds (e.g 2 minutes in the case below) has 
+  // passed if the job has not called the done callback
+  timeThreshold: (2 * 60 * 1000),
+
+  // Just the usual params that you pass to the "cron" module!
+  cronParams: {
+    cronTime: '00 */2 * * * *',
+    onTick: cronFn
+  }
+
+});
+```
+
+
+## Changelog
+
+### 0.2.0
+* Delete require cache for each job loaded
+* Add function _hasRunningJobs()_
+* Add function _getJobs()_
+* Add function _getRunningJobs()_
+* Improve test cases
+
+### 0.1.0
+
+* Initial release

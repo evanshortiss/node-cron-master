@@ -1,19 +1,37 @@
 'use strict';
 
-var loader = require('index.js')
+var loader = null
   , expect = require('chai').expect
   , sinon = require('sinon')
   , events = require('lib/events')
   , path = require('path');
 
 
-describe('Cron Loader', function () {
+describe('Cron Interface', function () {
 
   function loadValidJobs (done) {
     loader.loadJobs(path.join(__dirname, 'sample-jobs', './valid'), done);
   }
 
-  beforeEach(loader.stopJobs);
+  function stopJobs (done) {
+    if (loader) {
+      loader.stopJobs(done);
+    } else {
+      done();
+    }
+  }
+
+  afterEach(stopJobs);
+  beforeEach(stopJobs);
+
+  beforeEach(function () {
+    delete require.cache[require.resolve('index.js')];
+    loader = require('index.js');
+  });
+
+  beforeEach(function (done) {
+    loader.stopJobs(done);
+  });
 
   describe('#loadJobs', function () {
     it('Should not load invalid jobs', function (done) {
@@ -31,6 +49,70 @@ describe('Cron Loader', function () {
         expect(err).to.be.null;
         expect(jobs).to.be.an('array');
         expect(jobs).to.have.length(1);
+        done();
+      });
+    });
+  });
+
+  describe('#hasRunningJobs', function () {
+    it('Should return false', function () {
+      expect(loader.hasRunningJobs()).to.be.false;
+    });
+
+    it('Should return true', function (done) {
+      loadValidJobs(function (err, jobs) {
+        expect(err).to.be.null;
+        expect(jobs).to.be.an('array');
+
+        jobs.forEach(function (j) {
+          j.start();
+        });
+
+        setTimeout(function () {
+          expect(loader.hasRunningJobs()).to.be.true;
+          done();
+        }, 1100);
+      });
+    });
+  });
+
+  describe('#getJobs', function () {
+    it('Should return 1', function (done) {
+      loadValidJobs(function (err) {
+        expect(err).to.be.null;
+        expect(loader.getJobs()).to.have.length(1);
+        done();
+      });
+    });
+
+    it('Should return 0', function () {
+      expect(loader.getJobs()).to.have.length(0);
+    });
+  });
+
+  describe('#getRunningJobs', function () {
+    it('Should return 1 job', function (done) {
+      loadValidJobs(function (err, jobs) {
+        expect(err).to.be.null;
+        expect(jobs).to.be.an('array');
+
+        jobs.forEach(function (j) {
+          j.start();
+        });
+
+        setTimeout(function () {
+          expect(loader.getRunningJobs()).to.have.length(1);
+          done();
+        }, 1100);
+      });
+    });
+
+    it('Should return no jobs', function (done) {
+      loadValidJobs(function (err, jobs) {
+        expect(err).to.be.null;
+        expect(jobs).to.be.an('array');
+
+        expect(loader.getRunningJobs()).to.have.length(0);
         done();
       });
     });

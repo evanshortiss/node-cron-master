@@ -3,13 +3,25 @@
 var CronMasterJob = require('lib/cron-master-job')
   , events = require('lib/events')
   , expect = require('chai').expect
-  , sinon = require('sinon');
+  , sinon = require('sinon')
+  , dfCron = null;
 
 
 describe('Cron Master', function () {
 
+  beforeEach(stopDefaultCron)
+  afterEach(stopDefaultCron)
+
+  function stopDefaultCron (done) {
+    if (dfCron) {
+      dfCron.stop(done);
+    } else {
+      done();
+    }
+  }
+
   function getDefaultCron () {
-    return new CronMasterJob({
+    dfCron = new CronMasterJob({
       cronParams: {
         cronTime: '* * * * * *',
         onTick: function (master, done) {
@@ -17,6 +29,8 @@ describe('Cron Master', function () {
         }
       }
     });
+
+    return dfCron;
   }
 
   describe('#CronMasterJob', function () {
@@ -47,6 +61,7 @@ describe('Cron Master', function () {
       });
 
       expect(inst._opts.timeThreshold).to.equal(t);
+      inst.stop();
     });
 
     it('Should throw an error due to missing cron params', function () {
@@ -115,6 +130,7 @@ describe('Cron Master', function () {
         expect(finSpy.getCall(0).args[1]).to.equal('ok');
         expect(finSpy.getCall(0).args[2]).to.be.a('number');
 
+        inst.stop();
         done();
       }, 3000);
     })
