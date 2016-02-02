@@ -2,7 +2,7 @@ cron-master
 ===========
 
 [![build-status](https://travis-ci.org/evanshortiss/node-cron-master.svg?branch=master)
-](https://travis-ci.org/evanshortiss/node-cron-master.svg?branch=master)
+](https://travis-ci.org/evanshortiss/node-cron-master)
 [![version](https://badge.fury.io/js/cron-master.svg)
 ](https://badge.fury.io/js/cron-master.svg)
 
