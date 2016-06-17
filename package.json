@@ -1,6 +1,6 @@
 {
   "name": "cron-master",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Simple Cron management for Node.js applications",
   "main": "index.js",
   "dependencies": {

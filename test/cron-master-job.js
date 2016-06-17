@@ -72,9 +72,9 @@ describe('Cron Master', function () {
 
   });
 
-  describe('#forceRun', function () {
+  describe('#run', function () {
     it('Should run successfully with a callback', function (done) {
-      getDefaultCron().forceRun(function (err, result) {
+      getDefaultCron().run(function (err, result) {
         expect(err).to.be.null;
         expect(result).to.equal('ok');
         done();
@@ -82,10 +82,43 @@ describe('Cron Master', function () {
     });
 
     it('Should run successfully without a callback', function () {
-      getDefaultCron().forceRun();
+      getDefaultCron().run();
+    });
+
+    it('should not run if already in progress', function () {
+      var tickSpy = sinon.spy();
+      var job = new CronMasterJob({
+        cronParams: {
+          cronTime: '* * * * * *',
+          start: false,
+          onTick: tickSpy
+        }
+      });
+
+      job.run();
+      job.run();
+
+      expect(tickSpy.callCount).to.equal(1);
     });
   });
 
+  describe('#forceRun', function () {
+    it('should not run, even if already in progress', function () {
+      var tickSpy = sinon.spy();
+      var job = new CronMasterJob({
+        cronParams: {
+          cronTime: '* * * * * *',
+          start: false,
+          onTick: tickSpy
+        }
+      });
+
+      job.forceRun();
+      job.forceRun();
+
+      expect(tickSpy.callCount).to.equal(2);
+    });
+  });
 
   describe('#CRON_EVENTS', function () {
     it('Should trigger the main tick events', function (done) {

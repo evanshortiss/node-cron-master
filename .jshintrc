@@ -20,6 +20,7 @@
   "loopfunc": true,
   "indent": 2,
   "bitwise": true,
+  "expr": true,
   "noarg": true,
   "noempty": true,
   "nonew": true,
