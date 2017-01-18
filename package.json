@@ -1,6 +1,6 @@
 {
   "name": "cron-master",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Simple Cron management for Node.js applications",
   "main": "index.js",
   "dependencies": {
@@ -8,6 +8,17 @@
     "cron": "^1.0.9",
     "xtend": "^4.0.0"
   },
+  "keywords": [
+    "cron",
+    "master",
+    "manager",
+    "schedule",
+    "node-cron",
+    "cronjob",
+    "job",
+    "scheduler",
+    "task"
+  ],
   "devDependencies": {
     "chai": "^3.3.0",
     "mocha": "^2.3.3",
