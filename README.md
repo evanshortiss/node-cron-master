@@ -3,13 +3,23 @@ cron-master
 
 [![build-status](https://travis-ci.org/evanshortiss/node-cron-master.svg?branch=master)
 ](https://travis-ci.org/evanshortiss/node-cron-master)
-[![version](https://badge.fury.io/js/cron-master.svg)
+
+[![npm version](https://badge.fury.io/js/cron-master.svg)
 ](https://badge.fury.io/js/cron-master.svg)
+
+[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)
+](https://standardjs.com)
+
+[![!Dependency Scan](https://snyk.io/test/github/evanshortiss/node-cron-master/badge.svg)
+](https://snyk.io/org/evanshortiss/project/982f8d62-ce8e-4620-a1bf-b270166f7bac)
+
+[![TypeScript](https://badges.frapsoft.com/typescript/version/typescript-next.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
+
 
 cron-master provides a standardised way to manage your Node.js CronJobs created
 using the cron module.
 
-Typically in projects we'll see instances of _CronJob_ from the fantastic cron
+Typically in projects we'll see instances of _CronJob_ from the fantastic `cron`
 module scattered throughout the codebase meaning they're hard to find and not
 managed in a consistent manner. cron-master encourages the pattern of storing
 all jobs in a single location, and ensures they all follow the same pattern. It
@@ -28,11 +38,11 @@ again until the currently running call has completed.
 * Provides a structured way to create a manage jobs.
 * Enables jobs to emit and receive events, also provides useful default events.
 * Automatically computes time taken by each CronJob to complete.
-* Provides error, and/or result from each job via an event and/or callback.
+* Provides an error and/or result from each job via an event and/or callback.
 
 ## Install
 
-Seemples.
+Seemples!
 
 ```
 npm install cron-master --save
@@ -41,24 +51,35 @@ npm install cron-master --save
 
 ## API
 
-#### loadJobs(absolutePath, callback)
+### module.getInstance()
+Factory function that returns manager instances.
+
+```js
+const cmaster = require('cron-master');
+
+// This is our instance
+const instance = cmaster.getInstance()
+```
+
+### instance.loadJobs(absolutePath, callback)
 Loads all jobs contained in the specified folder, and place them under the
 managment of cron-master. Each file in the folder must have module.exports set
 to an instance of CronMasterJob.
 
 As of version 0.2.0 the jobs are not cached. This means if you call load jobs
-a second time with the same jobs a new instance of the file containing the job
+a second time with the same jobs, a new instance of the file containing the job
 will be loaded. This means the _require.cache_ for the specifc cron files your
-loading is deleted.
+loading is deleted to prevent conflicts
 
 The callback should be of the format _function(err, jobs)_. _jobs_ will be an
 Array of the managed jobs that were loaded.
 
 ```javascript
-var path = require('path')
-  , cmaster = require('cron-master');
+const path = require('path')
+const cmaster = require('cron-master');
+const manager = cmaster()
 
-cmaster.loadJobs(path.join(__dirname, '../', 'my-jobs'), function (err, jobs) {
+instance.loadJobs(path.join(__dirname, '../', 'my-jobs'), function (err, jobs) {
   if (err) {
     console.error('Failed to load jobs!');
   } else {
@@ -68,33 +89,28 @@ cmaster.loadJobs(path.join(__dirname, '../', 'my-jobs'), function (err, jobs) {
 ```
 
 
-#### hasRunningJobs()
+#### instance.hasRunningJobs()
 Returns a boolean indicating if any jobs are currently running.
 
-
-#### getJobs()
+#### instance.getJobs()
 Get an Array containing all currently loaded jobs.
 
-
-#### getRunningJobs()
+#### instance.getRunningJobs()
 Get an Array containing all currently running jobs.
 
-
-#### startJobs(callback)
-Starts all jobs that are being managed so that they will be run at the time(s)
+#### instance.startJobs(callback)
+Starts all jobs that are being managed so that they will be run at the time
 specified by their cron tab. Internally this will call the cron module _start_
 function for each job.
 
-
-#### stopJobs(callback)
+#### instance.stopJobs(callback)
 Stops all jobs being managed so they will no longer execute at the time
 specified by their cron tab. If any jobs are currently in the middle of a tick
 callback won't fire until they're all complete. Internally this will call the
 cron module _stop_ function for each job. You can short circuit your job
 function to stop early by by using the STOP_REQUESTED event, examples below.
 
-
-#### EVENTS
+### module.EVENTS
 A map of the event names, helps avoid spelling errors etc. Events:
 
 * TICK_STARTED - 'tick-started',
@@ -108,27 +124,26 @@ A map of the event names, helps avoid spelling errors etc. Events:
 Usage examples are included below.
 
 
-#### CronMasterJob
-This is a replacement for _cron.CronJob_ that you usually use but it requires
-parameters to be passed in an Object instead.
+### module.CronMasterJob
+This is a replacement for _cron.CronJob_ (the `cron` module from npm) that you
+usually use. It requires parameters to be passed in an Object.
 
-The function you usually pass as the _onTick_ to the cron module doesn't take a
-callback, but if using cron-master you must pass a accept a callback into your
-cron _onTick_ function as shown below.
+The function you usually pass as the _onTick_ parameter the cron module doesn't
+take a callback, but when using cron-master you must accept a callback into
+your cron _onTick_ function as shown below.
 
-##### CronMasterJob Functions
 Each job exposes the following functions for direct use if required:
 
-###### start([callback])
+#### instance.start([callback])
 Starts the job so that it will run at the specified time(s).
 
-###### forceRun([callback])
+#### instance.forceRun([callback])
 Force the job to run immediately even if already running.
 
-###### run([callback])
+#### instance.run([callback])
 Run the job if it is not currently in progress.
 
-###### stop([callback])
+#### instance.stop([callback])
 Stop the job so that it will not run at the specified time(s).
 
 
@@ -143,7 +158,7 @@ module.exports = new CronMasterJob({
   // Optional. Used to determine when to trigger the 'time-warning'. Fires after
   // the provided number of milliseconds (e.g 2 minutes in the case below) has
   // passed if the job has not called the done callback
-  timeThreshold: (2 * 60 * 1000),
+  timeThreshold: 2 * 60 * 1000,
 
   // Optional. Can be used to add useful meta data for a job
   meta: {
@@ -165,7 +180,7 @@ module.exports = new CronMasterJob({
 
 ## Examples
 
-#### Basic Job
+### Basic Job
 
 ```javascript
 
@@ -185,7 +200,7 @@ module.exports = new CronMasterJob({
 ```
 
 
-#### Adding Events to Jobs
+### Adding Events to Jobs
 
 ```javascript
 var path = require('path')
@@ -230,16 +245,16 @@ cmaster.loadJobs(path.join(__dirname, '../', 'my-jobs'), function (err, jobs) {
 ```
 
 
-#### Advanved Job with Short Circuit
+### Advanved Job with Short Circuit
 The job below runs every 2 minutes. Interestingly however, it binds a one time
 event listener to see if the job was requested to stop. If so it will prevent
 further execution and simply skip the business logic.
 
 ```javascript
 
-var CronMasterJob = require('cron-master').CronMasterJob  
-  , async = require('async')
-  , db = require('lib/db-wrapper');
+const CronMasterJob = require('cron-master').CronMasterJob  
+const async = require('async')
+const db = require('lib/db-wrapper')
 
 /**
  * Function to call for this cron job.
@@ -290,8 +305,15 @@ module.exports = new CronMasterJob({
 });
 ```
 
-
 ## Changelog
+
+### 1.0.0
+* Changed public interface
+* Added TypeScript typings
+* Updated tests to use Jest
+* Added coverage
+* Added Synk
+* Added StandardJS formatting
 
 ### 0.3.0
 * Renamed the _forceRun_ function to _run_ to reflect it's true behaviour
@@ -305,5 +327,4 @@ module.exports = new CronMasterJob({
 * Improve test cases
 
 ### 0.1.0
-
 * Initial release
