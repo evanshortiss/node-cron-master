@@ -5,7 +5,7 @@
 const expect = require('chai').expect
 const events = require('lib/events')
 const path = require('path')
-const cmaster = require('../index')
+const cmaster = require('../cron-master')
 
 describe('#loader', () => {
   let loader = null
