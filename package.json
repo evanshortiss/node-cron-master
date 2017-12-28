@@ -21,6 +21,7 @@
   ],
   "devDependencies": {
     "chai": "~3.3.0",
+    "coveralls": "~2.13.3",
     "jest": "~22.0.4",
     "mocha": "~2.3.3",
     "sinon": "~1.17.1",
