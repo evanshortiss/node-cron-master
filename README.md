@@ -2,18 +2,10 @@ cron-master
 ===========
 
 [![build-status](https://travis-ci.org/evanshortiss/node-cron-master.svg?branch=master)
-](https://travis-ci.org/evanshortiss/node-cron-master)
-
-[![npm version](https://badge.fury.io/js/cron-master.svg)
-](https://badge.fury.io/js/cron-master.svg)
-
-[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)
-](https://standardjs.com)
-
-[![!Dependency Scan](https://snyk.io/test/github/evanshortiss/node-cron-master/badge.svg)
-](https://snyk.io/org/evanshortiss/project/982f8d62-ce8e-4620-a1bf-b270166f7bac)
-
-[![TypeScript](https://badges.frapsoft.com/typescript/version/typescript-next.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
+](https://travis-ci.org/evanshortiss/node-cron-master)[![npm version](https://badge.fury.io/js/cron-master.svg)
+](https://badge.fury.io/js/cron-master.svg)[![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)
+](https://standardjs.com)[![!Dependency Scan](https://snyk.io/test/github/evanshortiss/node-cron-master/badge.svg)
+](https://snyk.io/org/evanshortiss/project/982f8d62-ce8e-4620-a1bf-b270166f7bac)[![TypeScript](https://badges.frapsoft.com/typescript/version/typescript-next.svg?v=101)](https://github.com/ellerbrock/typescript-badges/)
 
 
 cron-master provides a standardised way to manage your Node.js CronJobs created
