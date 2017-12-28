@@ -52,7 +52,7 @@
   },
   "scripts": {
     "test": "env NODE_PATH=. NODE_ENV=test jest",
-    "lint": "standard test/**/*.js example/**/*.js lib/**/*.js index.js --fix",
+    "lint": "standard test/**/*.js test/*.js example/*.js example/**/*.js lib/**/*.js index.js --fix",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "example": "node example/index.js"
   },

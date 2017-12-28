@@ -1,6 +1,6 @@
 'use strict'
 
-var CronMasterJob = require('../../index.js').CronMasterJob
+const CronMasterJob = require('../../cron-master').CronMasterJob
 
 module.exports = new CronMasterJob({
 
