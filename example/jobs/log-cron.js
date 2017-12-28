@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-var CronMasterJob = require('../../index.js').CronMasterJob;
+var CronMasterJob = require('../../index.js').CronMasterJob
 
 module.exports = new CronMasterJob({
 
@@ -9,11 +9,11 @@ module.exports = new CronMasterJob({
     cronTime: '* * * * * *',
     onTick: function (job, done) {
       // Create a random time to complete, within 0 - 2 seconds
-      var t = Math.floor(Math.random() * 2000);
+      var t = Math.floor(Math.random() * 2000)
 
       setTimeout(function () {
-        done(null, 'Example Job Result');
-      }, t);
+        done(null, 'Example Job Result')
+      }, t)
     }
   },
 
@@ -25,4 +25,4 @@ module.exports = new CronMasterJob({
     name: 'example-cron-job'
   }
 
-});
+})

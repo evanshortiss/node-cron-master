@@ -1,12 +1,12 @@
 {
   "name": "cron-master",
-  "version": "0.3.1",
-  "description": "Simple Cron management for Node.js applications",
-  "main": "index.js",
+  "version": "1.0.0",
+  "description": "Better cron management for Node.js applications",
+  "main": "cron-master.js",
+  "typings": "cron-master.d.ts",
   "dependencies": {
-    "async": "^1.4.2",
-    "cron": "^1.0.9",
-    "xtend": "^4.0.0"
+    "async": "~1.4.2",
+    "cron": "~1.3.0"
   },
   "keywords": [
     "cron",
@@ -20,13 +20,46 @@
     "task"
   ],
   "devDependencies": {
-    "chai": "^3.3.0",
-    "mocha": "^2.3.3",
-    "sinon": "^1.17.1"
+    "chai": "~3.3.0",
+    "jest": "~22.0.4",
+    "mocha": "~2.3.3",
+    "sinon": "~1.17.1",
+    "standard": "~10.0.3",
+    "typescript": "~2.6.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "mapCoverage": true,
+    "cache": false,
+    "collectCoverage": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 95,
+        "functions": 95,
+        "lines": 95,
+        "statements": 95
+      }
+    },
+    "testPathIgnorePatterns": [
+      "/sample-jobs/"
+    ],
+    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "node"
+    ]
   },
   "scripts": {
-    "test": "env NODE_PATH=. NODE_ENV=test mocha ./test -s 8000 -t 10000 -R spec",
+    "test": "env NODE_PATH=. NODE_ENV=test jest",
+    "lint": "standard test/**/*.js example/**/*.js lib/**/*.js index.js --fix",
+    "coveralls": "cat coverage/lcov.info | coveralls",
     "example": "node example/index.js"
+  },
+  "standard": {
+    "env": [
+      "mocha"
+    ]
   },
   "repository": {
     "type": "git",
@@ -34,6 +67,9 @@
   },
   "author": "Evan Shortiss",
   "license": "MIT",
+  "engines": {
+    "node": ">=4"
+  },
   "bugs": {
     "url": "https://github.com/evanshortiss/node-cron-master/issues"
   },
