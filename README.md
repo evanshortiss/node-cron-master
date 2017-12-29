@@ -299,6 +299,11 @@ module.exports = new CronMasterJob({
 
 ## Changelog
 
+### 1.0.1
+* Remove `EVENTS` from typings
+* Fix return type for `loadJobs` in typings
+* Fix `CronMasterJobOptions` to accept `meta` and `cronParams`
+
 ### 1.0.0
 * Changed public interface
 * Added TypeScript typings
